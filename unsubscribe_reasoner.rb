@@ -1,9 +1,6 @@
-reason_props = OpenStruct.new(short_desc: "", reason_types: [:too_many_emails, :no_longer_interested, :other_reason])
-unsubscribe_reasons = UnsubscribeReasonFactory.build_collection(reason_props)
-unsubscribe_reasoner = UnsubscribeReasoner.new(reason_props: reason_props)
-unsubscribe_reasons.each do |reason|
-  unsubscribe_reasoner.update_reason(reason_type: reason.class)
-end
+require "ostruct"
+require "pry"
+require "active_support/all"
 
 class UnsubscribeReasons
   def self.all
@@ -44,11 +41,10 @@ class OtherReason < UnsubscribeReason
 end
 
 class UnsubscribeReasoner
-  attr_accessor :reason_props, :reason_list
+  attr_accessor :reason_list
 
 # use reason_list as the pivot point in the code that contains if statements
-  def initialize(reason_props:)
-    @reason_props = reason_props
+  def initialize
     @reason_list = []
   end
 
@@ -71,3 +67,12 @@ class UnsubscribeReasoner
     reason_list << "I have another reason"
   end
 end
+
+reason_props = OpenStruct.new(short_desc: "", reason_types: [:too_many_emails, :no_longer_interested, :other_reason])
+unsubscribe_reasons = UnsubscribeReasonFactory.build_collection(reason_props)
+unsubscribe_reasoner = UnsubscribeReasoner.new
+unsubscribe_reasons.each do |reason|
+  unsubscribe_reasoner.update_reason(reason_type: reason.class)
+end
+
+p unsubscribe_reasoner.reason_list
